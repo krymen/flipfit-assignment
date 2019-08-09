@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
 /**
- * Data layer
+ * Data layer - mocked
  */
 @Injectable()
 export class Repository {
