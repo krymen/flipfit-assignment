@@ -1,6 +1,18 @@
 export class BSearch {
+  private static instance: BSearch;
+
   private _searchOperations: number = 0;
   private _singleElementOperations: number = 0;
+
+  private constructor() {}
+
+  public static getInstance() {
+    if (!BSearch.instance) {
+      BSearch.instance = new BSearch();
+    }
+
+    return BSearch.instance;
+  }
 
   public search(list: number[], numberToFind: number) {
     this._searchOperations++;
@@ -26,6 +38,11 @@ export class BSearch {
     }
 
     return this.searchRecursive(list, numberToFind, current + 1, to);
+  }
+
+  public clearOperationsCounters() {
+    this._searchOperations = 0;
+    this._singleElementOperations = 0;
   }
 
   get searchOperations(): number {

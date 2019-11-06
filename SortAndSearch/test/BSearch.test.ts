@@ -5,7 +5,9 @@ describe('Binary search', () => {
   const elementsToFind = [1, 5, 13, 27, 77];
 
   beforeEach(() => {
-    algorithm = new BSearch();
+    algorithm = BSearch.getInstance();
+
+    algorithm.clearOperationsCounters();
   });
 
   it('returns an index of the searched element', () => {
@@ -28,5 +30,9 @@ describe('Binary search', () => {
     algorithm.search(elementsToFind, 27);
 
     expect(algorithm.singleElementOperations).toEqual(2);
+  });
+
+  it('a singleton', () => {
+    expect(algorithm).toBe(BSearch.getInstance());
   });
 });
