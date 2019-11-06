@@ -1,8 +1,12 @@
 import { BSearch } from '../src/BSearch';
 
 describe('Binary search', () => {
-  const algorithm = new BSearch();
+  let algorithm: BSearch;
   const elementsToFind = [1, 5, 13, 27, 77];
+
+  beforeEach(() => {
+    algorithm = new BSearch();
+  });
 
   it('returns an index of the searched element', () => {
     expect(algorithm.search(elementsToFind, 77)).toEqual(4);
@@ -10,5 +14,19 @@ describe('Binary search', () => {
 
   it('returns -1 if given element cannot be found', () => {
     expect(algorithm.search(elementsToFind, 20)).toEqual(-1);
+  });
+
+  it('counts number of search operations', () => {
+    algorithm.search(elementsToFind, 77);
+    algorithm.search(elementsToFind, 20);
+    algorithm.search(elementsToFind, 5);
+
+    expect(algorithm.searchOperations).toEqual(3);
+  });
+
+  it('counts number of single element operations', () => {
+    algorithm.search(elementsToFind, 27);
+
+    expect(algorithm.singleElementOperations).toEqual(2);
   });
 });
