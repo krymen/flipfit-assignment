@@ -17,32 +17,25 @@ export class OrderMapper {
       products: number[];
     }>;
 
+    const products = await this.repository.fetchProducts();
+    const customers = await this.repository.fetchCustomers();
+
     return Promise.all(
       orders
         .filter(order => order.createdAt === day.toFormat('yyyy-MM-dd'))
         .map(async order => ({
           number: order.number,
-          customer: await this.customerWithId(order.customer),
-          products: await Promise.all(
-            order.products.map(
-              async orderedProduct => await this.productWithId(orderedProduct),
-            ),
-          ),
+          customer: this.customerWithId(customers, order.customer),
+          products: order.products.map(product => this.productWithId(products, product)),
         })),
     );
   }
 
-  private async customerWithId(customerId: number): Promise<Customer> {
-    const customers = await this.repository.fetchCustomers();
-    const { id, ...rest } = customers.find(c => c.id === customerId);
-
-    return rest;
+  private customerWithId(customers: any[], customerId: number): Customer {
+    return customers.find(c => c.id === customerId);
   }
 
-  private async productWithId(productId: number): Promise<Product> {
-    const products = await this.repository.fetchProducts();
-    const { id, ...rest } = products.find(product => product.id === productId);
-
-    return rest;
+  private productWithId(products: any[], productId: number): Product {
+    return products.find(product => product.id === productId);
   }
 }

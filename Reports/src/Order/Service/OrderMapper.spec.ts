@@ -53,17 +53,17 @@ describe('OrderMapper', () => {
     ).toEqual([
       {
         number: '2019/07/1',
-        customer: { firstName: 'John', lastName: 'Doe' },
+        customer: { id: 1, firstName: 'John', lastName: 'Doe' },
         products: [
-          { name: 'Black sport shoes', price: 110 },
-          { name: 'Cotton t-shirt XL', price: 25.75 },
+          { id: 1, name: 'Black sport shoes', price: 110 },
+          { id: 2, name: 'Cotton t-shirt XL', price: 25.75 },
         ],
       },
       {
         number: '2019/07/2',
-        customer: { firstName: 'Jane', lastName: 'Doe' },
+        customer: { id: 2, firstName: 'Jane', lastName: 'Doe' },
         products: [
-          { name: 'Black sport shoes', price: 110 },
+          { id: 1, name: 'Black sport shoes', price: 110 },
         ],
       },
     ]);
