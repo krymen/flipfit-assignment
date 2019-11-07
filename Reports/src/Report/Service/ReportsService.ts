@@ -1,4 +1,4 @@
-import { Inject } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { DateTime } from 'luxon';
 import * as R from 'ramda';
 import { OrderMapper } from '../../Order/Service/OrderMapper';
@@ -6,8 +6,9 @@ import { Order } from '../../Order/Model/Order';
 import { Product } from '../../Order/Model/Product';
 import { IBestSellers, IBestBuyers } from '../Model/IReports';
 
+@Injectable()
 export class ReportsService {
-  constructor(@Inject() readonly orderMapper: OrderMapper) {}
+  constructor(private readonly orderMapper: OrderMapper) {}
 
   public async bestSellingProducts(day: DateTime): Promise<IBestSellers[]> {
     const orders = await this.orderMapper.allOrdersOnDay(day);
