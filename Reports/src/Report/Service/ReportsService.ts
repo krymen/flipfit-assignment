@@ -2,8 +2,9 @@ import { Inject } from '@nestjs/common';
 import { DateTime } from 'luxon';
 import * as R from 'ramda';
 import { OrderMapper } from '../../Order/Service/OrderMapper';
+import { Order } from '../../Order/Model/Order';
 import { Product } from '../../Order/Model/Product';
-import { IBestSellers } from '../Model/IReports';
+import { IBestSellers, IBestBuyers } from '../Model/IReports';
 
 export class ReportsService {
   constructor(@Inject() readonly orderMapper: OrderMapper) {}
@@ -18,9 +19,26 @@ export class ReportsService {
       R.sort(R.descend(R.prop('totalPrice'))),
     )(orders);
   }
+
+  public async bestBuyer(day: DateTime): Promise<IBestBuyers> {
+    const orders = await this.orderMapper.allOrdersOnDay(day);
+
+    if (orders.length === 0) {
+      return {
+        customerName: '',
+        totalPrice: 0,
+      };
+    }
+
+    return R.pipe(
+      sumTotalPricePerCustomer,
+      R.sort(R.descend(R.prop('totalPrice'))),
+      R.head,
+    )(orders);
+  }
 }
 
-const sumQuantityAndTotalPrice = (
+const sumProductQuantityAndTotalPrice = (
   acc: IBestSellers,
   { price, name }: Product,
 ) => ({
@@ -33,9 +51,40 @@ const sumQuantityAndTotalPrice = (
 const sumQuantityAndTotalPricePerProduct = (products: ReadonlyArray<Product>) =>
   R.pipe(
     R.reduceBy(
-      sumQuantityAndTotalPrice,
+      sumProductQuantityAndTotalPrice,
       { totalPrice: 0, quantity: 0, productName: '' },
-      R.pipe(R.prop('id'), R.toString),
+      R.pipe(
+        R.prop('id'),
+        R.toString,
+      ),
+    ),
+    R.values,
+  )(products);
+
+const sumBy = <T extends object>(func: (obj: T) => number, list: T[]): number =>
+  R.pipe(
+    R.map(func),
+    R.sum,
+  )(list);
+
+const sumCustomerTotalPrice = (
+  acc: IBestBuyers,
+  { customer, products }: Order,
+) => ({
+  ...acc,
+  customerName: `${customer.firstName} ${customer.lastName}`,
+  totalPrice: acc.totalPrice + sumBy(R.prop('price'), products),
+});
+
+const sumTotalPricePerCustomer = (products: ReadonlyArray<Order>) =>
+  R.pipe(
+    R.reduceBy(
+      sumCustomerTotalPrice,
+      { customerName: '', totalPrice: 0 },
+      R.pipe(
+        R.prop('customer'),
+        R.toString,
+      ),
     ),
     R.values,
   )(products);
